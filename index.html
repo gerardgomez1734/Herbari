@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Herbari — Parc del Bosc</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root {
+  --paper:   #f5efe2;
+  --paper2:  #ede5d0;
+  --ink:     #1e160a;
+  --ink2:    #3d2e18;
+  --green:   #3a5a3a;
+  --green2:  #5a7a4a;
+  --gold:    #8a6a20;
+  --rust:    #7a3a1a;
+  --line:    rgba(58,90,58,0.18);
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Crimson Pro', Georgia, serif;
+  font-size: 17px;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+
+/* ── NOISE TEXTURE OVERLAY ── */
+body::before {
+  content:'';
+  position: fixed; inset:0; z-index:999; pointer-events:none;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ── RULED LINES ── */
+body::after {
+  content:'';
+  position: fixed; inset:0; z-index:0; pointer-events:none;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 31px,
+    var(--line) 31px,
+    var(--line) 32px
+  );
+  background-position: 0 48px;
+}
+
+/* ─────────────── PORTADA ─────────────── */
+.cover {
+  position: relative; z-index:1;
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 4rem 2rem;
+  text-align: center;
+  border-bottom: 2px solid var(--green);
+}
+
+.cover-border {
+  position: absolute; inset: 2rem;
+  border: 1px solid rgba(58,90,58,0.3);
+  pointer-events: none;
+}
+.cover-border::before {
+  content:'';
+  position: absolute; inset: 6px;
+  border: 1px solid rgba(58,90,58,0.15);
+}
+
+.cover-ornament {
+  font-family: 'IM Fell English', serif;
+  font-size: 2.2rem;
+  color: var(--green);
+  opacity: 0.5;
+  letter-spacing: 0.4em;
+  margin-bottom: 2rem;
+}
+
+.cover-tag {
+  font-family: 'Crimson Pro', serif;
+  font-size: 0.8rem;
+  font-style: italic;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 1rem;
+}
+
+.cover h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 300;
+  font-size: clamp(3.5rem, 10vw, 7rem);
+  line-height: 1;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+  margin-bottom: 0.5rem;
+}
+
+.cover h1 em {
+  font-style: italic;
+  color: var(--green);
+}
+
+.cover-subtitle {
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  font-size: 1.2rem;
+  color: var(--ink2);
+  margin: 1.5rem 0 3rem;
+  opacity: 0.7;
+}
+
+.cover-divider {
+  width: 120px; height: 1px;
+  background: linear-gradient(to right, transparent, var(--green), transparent);
+  margin: 0 auto 3rem;
+}
+
+.cover-meta {
+  font-size: 0.85rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--gold);
+  opacity: 0.8;
+}
+
+.scroll-hint {
+  position: absolute; bottom: 2.5rem; left: 50%; transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+  font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--green); opacity: 0.5;
+  animation: breathe 2.5s ease-in-out infinite;
+}
+.scroll-hint::after {
+  content:'';
+  width: 1px; height: 40px;
+  background: linear-gradient(to bottom, var(--green), transparent);
+}
+@keyframes breathe { 0%,100%{opacity:0.35} 50%{opacity:0.7} }
+
+/* ─────────────── SECCIONS INTRO ─────────────── */
+.section {
+  position: relative; z-index:1;
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 6rem 2.5rem;
+}
+
+.section + .section {
+  padding-top: 0;
+}
+
+.section-label {
+  font-size: 0.72rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 1.2rem;
+  display: flex; align-items: center; gap: 1rem;
+}
+.section-label::after {
+  content:'';
+  flex:1; height:1px;
+  background: linear-gradient(to right, var(--gold), transparent);
+  opacity: 0.4;
+}
+
+.section h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 300;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  line-height: 1.1;
+  color: var(--ink);
+  margin-bottom: 1.8rem;
+}
+
+.section h2 em { font-style:italic; color: var(--green); }
+
+.section p {
+  color: var(--ink2);
+  margin-bottom: 1.2rem;
+  font-size: 1.05rem;
+}
+
+.section p:last-child { margin-bottom:0; }
+
+/* separador entre seccions */
+.sep {
+  position: relative; z-index:1;
+  text-align: center;
+  padding: 1rem 0 3rem;
+  font-family: 'IM Fell English', serif;
+  font-size: 1.5rem;
+  color: var(--green);
+  opacity: 0.25;
+  letter-spacing: 0.5em;
+}
+
+/* ─────────────── CAPÇALERA PLANTES ─────────────── */
+.plants-header {
+  position: relative; z-index:1;
+  text-align: center;
+  padding: 5rem 2rem 2rem;
+  border-top: 1px solid rgba(58,90,58,0.2);
+}
+
+.plants-header h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 300;
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  letter-spacing: 0.05em;
+}
+
+.plants-header p {
+  font-style: italic;
+  color: var(--ink2);
+  margin-top: 0.8rem;
+  opacity: 0.7;
+}
+
+/* ─────────────── FITXES PLANTES ─────────────── */
+.plant-grid {
+  position: relative; z-index:1;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 4rem 2rem 8rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 5rem;
+}
+
+.plant-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  background: var(--paper2);
+  border: 1px solid rgba(58,90,58,0.2);
+  box-shadow: 4px 6px 24px rgba(30,22,10,0.08), 1px 2px 4px rgba(30,22,10,0.05);
+
+  /* animació entrada */
+  opacity: 0;
+  transform: translateY(48px);
+  transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1), transform 0.8s cubic-bezier(0.16,1,0.3,1);
+}
+
+.plant-card.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* alterna: parells van en ordre invers */
+.plant-card:nth-child(even) {
+  direction: rtl;
+}
+.plant-card:nth-child(even) > * {
+  direction: ltr;
+}
+
+/* foto / placeholder */
+.plant-img {
+  position: relative;
+  overflow: hidden;
+  min-height: 340px;
+  background: var(--paper);
+  display: flex; align-items: center; justify-content: center;
+  border-right: 1px solid rgba(58,90,58,0.15);
+}
+
+.plant-card:nth-child(even) .plant-img {
+  border-right: none;
+  border-left: 1px solid rgba(58,90,58,0.15);
+}
+
+.plant-img img {
+  width:100%; height:100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* placeholder botànic SVG */
+.plant-placeholder {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 1rem; padding: 2rem;
+  width:100%; height:100%;
+}
+
+.placeholder-icon {
+  opacity: 0.18;
+  color: var(--green);
+}
+
+.placeholder-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 0.8rem;
+  color: var(--green);
+  opacity: 0.4;
+  letter-spacing: 0.15em;
+  text-align: center;
+}
+
+/* contingut text */
+.plant-info {
+  padding: 2.5rem 2.8rem;
+  display: flex; flex-direction: column; justify-content: center;
+  gap: 1.2rem;
+}
+
+.plant-number {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--gold);
+  opacity: 0.8;
+}
+
+.plant-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 400;
+  font-size: 2rem;
+  line-height: 1.1;
+  color: var(--ink);
+}
+
+.plant-scientific {
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  font-size: 0.9rem;
+  color: var(--green);
+  margin-top: -0.5rem;
+  opacity: 0.8;
+}
+
+.plant-type {
+  display: inline-block;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--rust);
+  border: 1px solid rgba(122,58,26,0.3);
+  padding: 3px 10px;
+  border-radius: 1px;
+  width: fit-content;
+}
+
+.plant-divider {
+  width: 40px; height: 1px;
+  background: linear-gradient(to right, var(--green), transparent);
+}
+
+.plant-desc {
+  font-size: 0.95rem;
+  color: var(--ink2);
+  line-height: 1.75;
+}
+
+.plant-fields {
+  display: flex; flex-direction: column; gap: 0.6rem;
+  border-top: 1px solid rgba(58,90,58,0.12);
+  padding-top: 1.2rem;
+  margin-top: 0.3rem;
+}
+
+.plant-field {
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  gap: 0.5rem;
+  font-size: 0.88rem;
+}
+
+.field-label {
+  font-family: 'Crimson Pro', serif;
+  font-style: italic;
+  color: var(--gold);
+  opacity: 0.9;
+  padding-top: 1px;
+}
+
+.field-value {
+  color: var(--ink2);
+  line-height: 1.5;
+}
+
+.plant-curiosity {
+  background: rgba(58,90,58,0.06);
+  border-left: 2px solid var(--green);
+  padding: 0.8rem 1rem;
+  font-size: 0.88rem;
+  color: var(--ink2);
+  font-style: italic;
+  line-height: 1.6;
+}
+
+.plant-curiosity strong {
+  font-style: normal;
+  font-weight: 400;
+  color: var(--green);
+  letter-spacing: 0.05em;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 0.3rem;
+}
+
+/* ─────────────── RESPONSIVE ─────────────── */
+@media (max-width: 680px) {
+  .plant-card,
+  .plant-card:nth-child(even) {
+    grid-template-columns: 1fr;
+    direction: ltr;
+  }
+  .plant-img { min-height: 220px; border-right:none; border-bottom: 1px solid rgba(58,90,58,0.15); }
+  .plant-card:nth-child(even) .plant-img { border-left:none; border-bottom: 1px solid rgba(58,90,58,0.15); }
+  .plant-info { padding: 1.8rem; }
+}
+
+/* ─────────────── PEU ─────────────── */
+footer {
+  position: relative; z-index:1;
+  text-align: center;
+  padding: 3rem 2rem 4rem;
+  border-top: 1px solid rgba(58,90,58,0.2);
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 0.9rem;
+  color: var(--green);
+  opacity: 0.5;
+}
+</style>
+</head>
+<body>
+
+<!-- ══ PORTADA ══ -->
+<section class="cover">
+  <div class="cover-border"></div>
+  <h1><em>Herbari</em></h1>
+  <p class="cover-subtitle">Plantes recollides al parc de la timba</p>
+  <div class="cover-divider"></div>
+  <div class="scroll-hint">continua</div>
+</section>
+
+<!-- ══ QUÈ ÉS UN HERBARI ══ -->
+<div class="section reveal">
+  <p class="section-label">Introducció</p>
+  <h2>Què és un <em>herbari</em>?</h2>
+  <p>Un herbari és una col·lecció de plantes recollides, seques i preservades, acompanyades d'informació científica sobre cada espècie. Els herbaris s'han utilitzat durant segles com a eina fonamental per a l'estudi de la botànica, la medicina i l'ecologia.</p>
+  <p>Les primeres col·leccions d'aquest tipus van aparèixer a Europa al segle XVI, i avui en dia els herbaris científics conserven milions d'espècimens que serveixen per estudiar la biodiversitat, fer recerca sobre plantes medicinals i documentar els canvis en la flora al llarg del temps.</p>
+  <p>Un herbari ben fet no és només una col·lecció de fulles seques: és un registre científic que permet identificar plantes, comparar espècies i aprendre a observar la natura amb més atenció.</p>
+</div>
+
+<div class="sep"></div>
+
+<!-- ══ PER QUÈ AQUEST PARC ══ -->
+<div class="section reveal">
+  <p class="section-label">El nostre herbari</p>
+  <h2>Per què <em>aquestes plantes</em>?</h2>
+  <p>Per a aquest treball hem sortit al parc proper a l'escola i hem explorat els seus racons: els camins de terra, les jardineres d'aromàtiques, els marges del bosc i les esplanades obertes.</p>
+  <p>Hem escollit 8 espècies que ens van cridar l'atenció per la seva forma, el seu color, la seva olor o la seva història. Algunes eren fàcils de reconèixer, d'altres van necessitar recerca. Totes elles formen part del paisatge quotidià del nostre barri, però sovint passen desapercebudes.</p>
+  <p>L'objectiu d'aquest herbari és aprendre a mirar el que tenim a prop amb ulls científics i descobrir que la natura és plena de curiositats, fins i tot en un parc urbà.</p>
+</div>
+
+<div class="sep"></div>
+
+<!-- ══ CAPÇALERA PLANTES ══ -->
+<div class="plants-header reveal">
+  <h2>Les 8 espècies</h2>
+  <p>Fitxes botàniques de les plantes recollides</p>
+</div>
+
+<!-- ══ FITXES ══ -->
+<div class="plant-grid">
+
+  <!-- 1. Heura -->
+  <div class="plant-card">
+    <div class="plant-img">
+      <div class="plant-placeholder">
+        <svg class="placeholder-icon" width="80" height="80" viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.2">
+          <path d="M40 70 C40 70 20 55 20 38 C20 27 29 18 40 18 C51 18 60 27 60 38 C60 55 40 70 40 70Z"/>
+          <path d="M40 18 C40 18 30 28 35 42"/>
+          <path d="M40 18 C40 18 50 28 45 42"/>
+          <line x1="40" y1="18" x2="40" y2="70"/>
+        </svg>
+        <span class="placeholder-text">Foto de la planta</span>
+      </div>
+    </div>
+    <div class="plant-info">
+      <span class="plant-number">Espècie 01</span>
+      <div>
+        <div class="plant-name">Heura</div>
+        <div class="plant-scientific">Hedera helix L.</div>
+      </div>
+      <span class="plant-type">Arbust enfiladís</span>
+      <div class="plant-divider"></div>
+      <p class="plant-desc">Fulles perennes, dures, de color verd fosc brillant i generalment lobulades (amb forma d'estrella de 3 o 5 puntes). Les flors són petites i verdoses.</p>
+      <div class="plant-fields">
+        <div class="plant-field">
+          <span class="field-label">On la vam trobar</span>
+          <span class="field-value">Enfilada al tronc d'un pi del parc</span>
+        </div>
+      </div>
+      <div class="plant-curiosity">
+        <strong>Curiositat</strong>
+        Excel·lent per purificar l'aire, però cal anar amb compte: els seus fruits (petites baies negres) són tòxics si s'ingereixen.
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Paciència -->
+  <div class="plant-card">
+    <div class="plant-img">
+      <div class="plant-placeholder">
+        <svg class="placeholder-icon" width="80" height="80" viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.2">
+          <path d="M40 65 C40 65 15 50 18 30 C20 18 35 14 40 14 C45 14 60 18 62 30 C65 50 40 65 40 65Z"/>
+          <path d="M40 14 L40 65"/>
+          <path d="M25 30 C30 35 40 33 48 28"/>
+          <path d="M22 44 C30 48 40 46 52 40"/>
+        </svg>
+        <span class="placeholder-text">Foto de la planta</span>
+      </div>
+    </div>
+    <div class="plant-info">
+      <span class="plant-number">Espècie 02</span>
+      <div>
+        <div class="plant-name">Paciència</div>
+        <div class="plant-scientific">Rumex patientia L.</div>
+      </div>
+      <span class="plant-type">Herbàcia</span>
+      <div class="plant-divider"></div>
+      <p class="plant-desc">Fulles grans, allargades i amb les vores lleugerament ondulades. Les flors són diminutes, verdoses o rogenques, i s'agrupen en espigues altes i denses.</p>
+      <div class="plant-fields">
+        <div class="plant-field">
+          <span class="field-label">On la vam trobar</span>
+          <span class="field-value">Al mig del parc, amb una fulla caiguda que vam recollir</span>
+        </div>
+      </div>
+      <div class="plant-curiosity">
+        <strong>Curiositat</strong>
+        Antigament les seves fulles es consumien com a verdura, semblant als espinacs, amb un sabor lleugerament àcid molt característic.
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Fotínia -->
+  <div class="plant-card">
+    <div class="plant-img">
+      <div class="plant-placeholder">
+        <svg class="placeholder-icon" width="80" height="80" viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.2">
+          <ellipse cx="40" cy="38" rx="18" ry="26"/>
+          <path d="M40 12 L40 64"/>
+          <path d="M22 38 C28 34 40 36 58 38"/>
+          <path d="M25 25 C30 22 40 24 52 28"/>
+          <path d="M25 50 C30 47 40 49 55 52"/>
+        </svg>
+        <span class="placeholder-text">Foto de la planta</span>
+      </div>
+    </div>
+    <div class="plant-info">
+      <span class="plant-number">Espècie 03</span>
+      <div>
+        <div class="plant-name">Fotínia</div>
+        <div class="plant-scientific">Photinia fraseri Dress</div>
+      </div>
+      <span class="plant-type">Arbust</span>
+      <div class="plant-divider"></div>
+      <p class="plant-desc">Fulles perennes, ovalades i dentades. Les fulles joves neixen d'un vermell brillant molt cridaner i, a mesura que maduren, es tornen verdes. Les flors son blanques i petites.</p>
+      <div class="plant-fields">
+        <div class="plant-field">
+          <span class="field-label">On la vam trobar</span>
+          <span class="field-value">La fulla la vam trobar pel terra del parc</span>
+        </div>
+      </div>
+      <div class="plant-curiosity">
+        <strong>Curiositat</strong>
+        Molt utilitzada en jardineria urbana pel contrast de colors tan bonic que ofereix a la primavera.
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Xiprer -->
+  <div class="plant-card">
+    <div class="plant-img">
+      <div class="plant-placeholder">
+        <svg class="placeholder-icon" width="80" height="80" viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.2">
+          <path d="M40 68 L40 12"/>
+          <path d="M40 20 L28 32 L40 28 L52 32 Z"/>
+          <path d="M40 32 L24 46 L40 40 L56 46 Z"/>
+          <path d="M40 46 L20 62 L40 54 L60 62 Z"/>
+        </svg>
+        <span class="placeholder-text">Foto de la planta</span>
+      </div>
+    </div>
+    <div class="plant-info">
+      <span class="plant-number">Espècie 04</span>
+      <div>
+        <div class="plant-name">Xiprer</div>
+        <div class="plant-scientific">Hesperocyparis lusitanica (Mill.) Bartel</div>
+      </div>
+      <span class="plant-type">Arbre · Conífera</span>
+      <div class="plant-divider"></div>
+      <p class="plant-desc">Fullatge molt dens. Les fulles són minúscules, amb forma d'escata (esquamiformes) i de color verd blavós. Els seus fruits són cons rodons i petits anomenats estròbils.</p>
+      <div class="plant-fields">
+        <div class="plant-field">
+          <span class="field-label">On la vam trobar</span>
+          <span class="field-value">La fulla la vam trobar pel terra del parc</span>
+        </div>
+      </div>
+      <div class="plant-curiosity">
+        <strong>Curiositat</strong>
+        Tot i que el seu nom conté "lusitanica" (referència a Portugal), en realitat és originari de Mèxic i Amèrica Central.
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. Espígol -->
+  <div class="plant-card">
+    <div class="plant-img">
+      <div class="plant-placeholder">
+        <svg class="placeholder-icon" width="80" height="80" viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.2">
+          <line x1="40" y1="68" x2="40" y2="20"/>
+          <ellipse cx="40" cy="16" rx="5" ry="8"/>
+          <path d="M40 30 C34 26 28 28 26 34"/>
+          <path d="M40 30 C46 26 52 28 54 34"/>
+          <path d="M40 42 C34 38 28 40 26 46"/>
+          <path d="M40 42 C46 38 52 40 54 46"/>
+          <path d="M40 54 C36 50 32 52 31 56"/>
+          <path d="M40 54 C44 50 48 52 49 56"/>
+        </svg>
+        <span class="placeholder-text">Foto de la planta</span>
+      </div>
+    </div>
+    <div class="plant-info">
+      <span class="plant-number">Espècie 05</span>
+      <div>
+        <div class="plant-name">Espígol</div>
+        <div class="plant-scientific">Lavanda dentata L.</div>
+      </div>
+      <span class="plant-type">Arbust</span>
+      <div class="plant-divider"></div>
+      <p class="plant-desc">Fulles de color verd grisaci amb les vores dentades. Les flors són d'un color lila suau, agrupades a la part superior de la tija, i fan moltíssima olor.</p>
+      <div class="plant-fields">
+        <div class="plant-field">
+          <span class="field-label">On la vam trobar</span>
+          <span class="field-value">En una de les jardineres juntament amb altres plantes aromàtiques</span>
+        </div>
+      </div>
+      <div class="plant-curiosity">
+        <strong>Curiositat</strong>
+        L'aroma de les seves flors s'utilitza molt en perfumeria, i també atrau gran quantitat d'insectes pol·linitzadors com abelles i papallones.
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. Fonoll -->
+  <div class="plant-card">
+    <div class="plant-img">
+      <div class="plant-placeholder">
+        <svg class="placeholder-icon" width="80" height="80" viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.2">
+          <line x1="40" y1="70" x2="40" y2="20"/>
+          <circle cx="40" cy="18" r="10"/>
+          <line x1="40" y1="8" x2="30" y2="14"/>
+          <line x1="40" y1="8" x2="50" y2="14"/>
+          <line x1="40" y1="18" x2="28" y2="22"/>
+          <line x1="40" y1="18" x2="52" y2="22"/>
+          <line x1="40" y1="20" x2="38" y2="28"/>
+          <line x1="40" y1="20" x2="42" y2="28"/>
+        </svg>
+        <span class="placeholder-text">Foto de la planta</span>
+      </div>
+    </div>
+    <div class="plant-info">
+      <span class="plant-number">Espècie 06</span>
+      <div>
+        <div class="plant-name">Fonoll</div>
+        <div class="plant-scientific">Foeniculum vulgare Mill.</div>
+      </div>
+      <span class="plant-type">Herbàcia</span>
+      <div class="plant-divider"></div>
+      <p class="plant-desc">Tiges altes i verdes. Les fulles estan molt dividides i són primes com fils. Les flors són petites, grogues, agrupades formant una umbel·la. Desprèn una forta olor d'anís.</p>
+      <div class="plant-fields">
+        <div class="plant-field">
+          <span class="field-label">On la vam trobar</span>
+          <span class="field-value">Als marges del camí de terra, al costat d'uns troncs</span>
+        </div>
+      </div>
+      <div class="plant-curiosity">
+        <strong>Curiositat</strong>
+        S'utilitza en la gastronomia per condimentar sopes i peix, i en infusió ajuda a millorar la digestió.
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. Olivella -->
+  <div class="plant-card">
+    <div class="plant-img">
+      <div class="plant-placeholder">
+        <svg class="placeholder-icon" width="80" height="80" viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.2">
+          <path d="M40 65 C28 55 18 44 20 32 C22 20 32 16 40 16 C48 16 58 20 60 32 C62 44 52 55 40 65Z"/>
+          <path d="M40 16 C40 16 38 35 36 45"/>
+          <path d="M40 16 C40 16 44 30 48 40"/>
+          <ellipse cx="30" cy="34" rx="8" ry="5" transform="rotate(-20 30 34)"/>
+          <ellipse cx="50" cy="30" rx="8" ry="5" transform="rotate(20 50 30)"/>
+        </svg>
+        <span class="placeholder-text">Foto de la planta</span>
+      </div>
+    </div>
+    <div class="plant-info">
+      <span class="plant-number">Espècie 07</span>
+      <div>
+        <div class="plant-name">Olivella</div>
+        <div class="plant-scientific">Teucrium fruticans L.</div>
+      </div>
+      <span class="plant-type">Arbust</span>
+      <div class="plant-divider"></div>
+      <p class="plant-desc">Les fulles recorden les de l'olivera: verdes i brillants per sobre, blanquinoses o grises per sota. Fa unes flors d'un blau clar o lila, amb estams llargs i vistosos.</p>
+      <div class="plant-fields">
+        <div class="plant-field">
+          <span class="field-label">On la vam trobar</span>
+          <span class="field-value">En uns massissos de plantes de baix manteniment, a ple sol</span>
+        </div>
+      </div>
+      <div class="plant-curiosity">
+        <strong>Curiositat</strong>
+        Espècie típicament mediterrània, capaç de suportar llargues temporades de sequera i molta calor.
+      </div>
+    </div>
+  </div>
+
+  <!-- 8. Card marià -->
+  <div class="plant-card">
+    <div class="plant-img">
+      <div class="plant-placeholder">
+        <svg class="placeholder-icon" width="80" height="80" viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.2">
+          <circle cx="40" cy="32" r="14"/>
+          <path d="M40 18 L40 10"/>
+          <path d="M40 46 L40 66"/>
+          <path d="M26 32 L14 32"/>
+          <path d="M54 32 L66 32"/>
+          <path d="M30 22 L22 14"/>
+          <path d="M50 22 L58 14"/>
+          <path d="M30 42 L22 50"/>
+          <path d="M50 42 L58 50"/>
+          <circle cx="40" cy="32" r="6"/>
+        </svg>
+        <span class="placeholder-text">Foto de la planta</span>
+      </div>
+    </div>
+    <div class="plant-info">
+      <span class="plant-number">Espècie 08</span>
+      <div>
+        <div class="plant-name">Card marià</div>
+        <div class="plant-scientific">Silybum marianum (L.) Gaertn.</div>
+      </div>
+      <span class="plant-type">Herbàcia</span>
+      <div class="plant-divider"></div>
+      <p class="plant-desc">Fulles grans, brillants, amb els marges espinosos i unes característiques taques de color blanc lletós. La flor és de color rosa intens o violeta, envoltada per bràctees en punxa.</p>
+      <div class="plant-fields">
+        <div class="plant-field">
+          <span class="field-label">On la vam trobar</span>
+          <span class="field-value">En una esplanada rústica a les vores del parc</span>
+        </div>
+      </div>
+      <div class="plant-curiosity">
+        <strong>Curiositat</strong>
+        Una de les plantes medicinals més importants per cuidar el fetge. D'ella s'extreu la silimarina, que ajuda a regenerar les cèl·lules hepàtiques.
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  Herbari del Parc · Ciències Naturals · Curs 2024–25
+</footer>
+
+<script>
+  /* ── Scroll reveal ── */
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12 });
+
+  document.querySelectorAll('.plant-card').forEach(el => observer.observe(el));
+
+  /* Seccions intro */
+  const revealObs = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+        revealObs.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15 });
+
+  document.querySelectorAll('.reveal').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(32px)';
+    el.style.transition = 'opacity 0.9s cubic-bezier(0.16,1,0.3,1), transform 0.9s cubic-bezier(0.16,1,0.3,1)';
+    revealObs.observe(el);
+  });
+</script>
+</body>
+</html>
